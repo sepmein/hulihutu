@@ -1,9 +1,10 @@
-syntax = "proto3"
+syntax = "proto3";
 
 service Hulihutu {
     rpc GetNextMove(Board) returns (Move) {}
 }
-Message Board {
+
+message Board {
     enum Grid {
         EMPTY = 0;
         CIRCLE = 1;
@@ -20,7 +21,7 @@ Message Board {
     Grid nine = 9;
 }
 
-Message Move {
+message Move {
     int32 row = 1;
     int32 column = 2;
-stValue}
+}

@@ -1,0 +1,26 @@
+syntax = "proto3"
+
+service Hulihutu {
+    rpc GetNextMove(Board) returns (Move) {}
+}
+Message Board {
+    enum Grid {
+        EMPTY = 0;
+        CIRCLE = 1;
+        CROSS = 2;
+    }
+    Grid one = 1;
+    Grid two = 2;
+    Grid three = 3;
+    Grid four = 4;
+    Grid five = 5;
+    Grid six = 6;
+    Grid seven = 7;
+    Grid eight = 8;
+    Grid nine = 9;
+}
+
+Message Move {
+    int32 row = 1;
+    int32 column = 2;
+stValue}

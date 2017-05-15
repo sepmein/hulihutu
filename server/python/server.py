@@ -22,5 +22,4 @@ def serve():
     except KeyboardInterrupt:
         server.stop(0)
         
-if __name__ == '__main':
-    serve()
+serve()

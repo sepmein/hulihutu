@@ -1,4 +1,5 @@
-const PROTO_PATH = __dirname + '/src/Hulihutu.proto';
+console.log(__dirname);
+const PROTO_PATH = __dirname + '../../src/Hulihutu.proto';
 
 const grpc = require('grpc')
 let Hulihutu = grpc.load(PROTO_PATH).Hulihutu;

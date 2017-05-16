@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import 'whatwg-fetch'
 import './index.css'
 
 function calculateWinner(squares) {
@@ -32,12 +33,34 @@ class Square extends React.Component {
     }
 }
 
+class Status extends React.Component {
+    render() {
+        const winner = calculateWinner(this.props.squares);
+        let status;
+        if (winner) {
+            status = 'Winner: ' + winner;
+        } else {
+            status = 'Next Player: ' + (this.props.xIsNext ? 'X' : 'O');
+        }
+        return (
+            <div className="status">{status}</div>
+        )
+    }
+}
+
+class Actions extends React.Component {
+    render() {
+        return (
+            <p>actions</p>
+        )
+    }
+}
 class Board extends React.Component {
     constructor(){
         super();
         this.state = {
             squares: Array(9).fill(null),
-            xIsNext: true
+            xIsNext: false
         }
     }
 
@@ -59,16 +82,9 @@ class Board extends React.Component {
     }
 
     render() {
-        const winner = calculateWinner(this.state.squares);
-        let status;
-        if (winner) {
-            status = 'Winner: ' + winner;
-        } else {
-            status = 'Next Player: ' + (this.state.xIsNext ? 'X' : 'O');
-        }
         return (
             <div>
-                <div className="status">{status}</div>
+                <Status squares={this.state.squares} xIsNext={this.state.xIsNext}/>
                 <div className="board-row">
                     {this.renderSquare(0)}
                     {this.renderSquare(1)}
@@ -84,6 +100,7 @@ class Board extends React.Component {
                     {this.renderSquare(7)}
                     {this.renderSquare(8)}
                 </div>
+                <Actions/>
             </div>
         );
     }

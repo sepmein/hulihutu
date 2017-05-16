@@ -12,4 +12,4 @@ start: startPythonServer startNodeServer
 setup:
 	cd ./server/node
 	npm install
-	pip3 install grpcio grpcio_tools -U
+	pip3 install grpcio grpcio_tools hulihutu -U

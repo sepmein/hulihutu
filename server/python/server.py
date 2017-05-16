@@ -4,12 +4,16 @@ import Hulihutu_pb2
 import Hulihutu_pb2_grpc
 import time
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
+import ai
 
 class HulihutuServicer(Hulihutu_pb2_grpc.HulihutuServicer):
     """Provides methods that implement functionality of route guide server."""
 
     def GetNextMove(self, request, context):
-        return Hulihutu_pb2.Move(row=1, column=1) 
+        print(request)
+        board = request
+        action = ai.get_next_move(board)
+        return Hulihutu_pb2.Move(row=action[0], column=action[1]) 
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))

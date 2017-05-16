@@ -65,7 +65,12 @@ class Board extends React.Component {
         super();
         this.state = {
             squares: Array(9).fill(null),
-            xIsNext: false
+            xIsNext: false,
+            humanFirst: Math.random() >= 0.5
+        }
+        if (!this.state.humanFirst) {
+            console.log(this.state)
+            this.hulihutuPlay();
         }
     }
 
@@ -75,32 +80,54 @@ class Board extends React.Component {
             return;
         }
         squares[i] = this.state.xIsNext ? 'X' : 'O';
-        this.setState({squares: squares, xIsNext: !this.state.xIsNext});
-        this.handleRequest();
+        this.setState({squares: squares, xIsNext: !this.state.xIsNext}, ()=> {
+            this.hulihutuPlay();
+        });
     }
 
     handleRestart() {
         this.setState({
             squares: Array(9).fill(null),
-            xIsNext: false
+            xIsNext: false,
+            humanFirst: Math.random >= 0.5
         });
     }
 
-    handleRequest() {
+    hulihutuPlay() {
+        var that = this;
+        function mapSymbolToCode(symbol){
+            if (symbol == 'O') {
+                return 1;
+            } else if (symbol == 'X') {
+                return 2;
+            } else {
+                return 0
+            }
+        }
         fetch('http://localhost:3000',{
             method: 'POST',
             body: JSON.stringify({
-                'one': this.state.squares[0],
-                'two': this.state.squares[1],
-                'three': this.state.squares[2],
-                'four': this.state.squares[3],
-                'five': this.state.squares[4],
-                'six': this.state.squares[5],
-                'seven': this.state.squares[6],
-                'eight': this.state.squares[7],
-                'nine': this.state.squares[8]
-            })}).then(function(response){
+                'one': mapSymbolToCode(this.state.squares[0]),
+                'two': mapSymbolToCode(this.state.squares[1]),
+                'three': mapSymbolToCode(this.state.squares[2]),
+                'four': mapSymbolToCode(this.state.squares[3]),
+                'five': mapSymbolToCode(this.state.squares[4]),
+                'six': mapSymbolToCode(this.state.squares[5]),
+                'seven': mapSymbolToCode(this.state.squares[6]),
+                'eight': mapSymbolToCode(this.state.squares[7]),
+                'nine': mapSymbolToCode(this.state.squares[8])
+            })})
+            .then(response=> response.json())
+            .then(response => {
                 console.log(response);
+                var i = response.row *3 + response.column ;
+                console.log(i)
+                const squares = this.state.squares.slice();
+                if (calculateWinner(squares) || squares[i]) {
+                    return;
+                }
+                squares[i] = this.state.xIsNext ? 'X' : 'O';
+                this.setState({squares: squares, xIsNext: !this.state.xIsNext});
             }, function(error){
                 console.log(error);
             });

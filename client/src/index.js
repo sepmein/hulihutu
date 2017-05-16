@@ -106,6 +106,10 @@ class Board extends React.Component {
         }
         fetch('http://localhost:3000',{
             method: 'POST',
+            headers: {
+                'Accept': 'application/json, text/plain, */*',
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({
                 'one': mapSymbolToCode(this.state.squares[0]),
                 'two': mapSymbolToCode(this.state.squares[1]),

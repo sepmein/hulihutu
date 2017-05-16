@@ -6,6 +6,7 @@ let client = new Hulihutu('localhost:50051', grpc.credentials.createInsecure());
 
 module.exports = function getNextMove(board){
     return new Promise(function(resolve, reject){
+        console.log(board);
         client.getNextMove(board, function(error, move){
             if(!error) {
                 resolve(move);

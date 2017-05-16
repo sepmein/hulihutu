@@ -10,9 +10,10 @@ class HulihutuServicer(Hulihutu_pb2_grpc.HulihutuServicer):
     """Provides methods that implement functionality of route guide server."""
 
     def GetNextMove(self, request, context):
-        print(request)
-        board = request
-        action = ai.get_next_move(board)
+        action = ai.get_next_move(request)
+        print(request.one)
+        print(request.two)
+        print(request.three)
         return Hulihutu_pb2.Move(row=action[0], column=action[1]) 
 
 def serve():

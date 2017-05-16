@@ -10,6 +10,7 @@ tt = tictac.Tictac()
     input a board, get a move
 """
 def get_next_move(board):
+    print(board)
     tt.board[0,0] = getValue(board.one)
     tt.board[0,1] = getValue(board.two)
     tt.board[0,2] = getValue(board.three)
@@ -19,14 +20,15 @@ def get_next_move(board):
     tt.board[2,0] = getValue(board.seven)
     tt.board[2,1] = getValue(board.eight)
     tt.board[2,2] = getValue(board.nine)
+    print(tt.board)
     num_circle = np.count_nonzero(tt.board == 1)
     num_cross = np.count_nonzero(tt.board == -1)
     if num_circle > num_cross:
-        tt.color = 1
-        (action, value, method) = tt.apply_policy(policy.pai, 'max')
-    else:
         tt.color = -1
         (action, value, method) = tt.apply_policy(policy.pai, 'min')
+    else:
+        tt.color = 1
+        (action, value, method) = tt.apply_policy(policy.pai, 'max')
     return action
 
 def getKey(x):

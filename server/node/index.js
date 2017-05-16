@@ -8,6 +8,7 @@ app.use(bodyparser());
 app.use(async function(ctx, next) {
     //    console.log(ctx.request.body);
     ctx.set('Access-Control-Allow-Origin', '*');
+    ctx.set('Access-Control-Allow-Headers', 'Content-Type, Accept, Access-Control-Allow-Headers');
     board = ctx.request.body;
     move = await getNextMove(board);
     //    console.log(move);

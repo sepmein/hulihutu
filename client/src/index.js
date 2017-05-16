@@ -51,7 +51,12 @@ class Status extends React.Component {
 class Actions extends React.Component {
     render() {
         return (
-            <p>actions</p>
+            <div>
+                <p>actions</p>
+                <button onClick={()=> this.props.handleRestart()}>
+                    Restart
+                </button>
+            </div>
         )
     }
 }
@@ -71,7 +76,36 @@ class Board extends React.Component {
         }
         squares[i] = this.state.xIsNext ? 'X' : 'O';
         this.setState({squares: squares, xIsNext: !this.state.xIsNext});
+        this.handleRequest();
     }
+
+    handleRestart() {
+        this.setState({
+            squares: Array(9).fill(null),
+            xIsNext: false
+        });
+    }
+
+    handleRequest() {
+        fetch('http://localhost:3000',{
+            method: 'POST',
+            body: JSON.stringify({
+                'one': this.state.squares[0],
+                'two': this.state.squares[1],
+                'three': this.state.squares[2],
+                'four': this.state.squares[3],
+                'five': this.state.squares[4],
+                'six': this.state.squares[5],
+                'seven': this.state.squares[6],
+                'eight': this.state.squares[7],
+                'nine': this.state.squares[8]
+            })}).then(function(response){
+                console.log(response);
+            }, function(error){
+                console.log(error);
+            });
+    }
+
     renderSquare(i) {
         return (
             <Square
@@ -100,7 +134,7 @@ class Board extends React.Component {
                     {this.renderSquare(7)}
                     {this.renderSquare(8)}
                 </div>
-                <Actions/>
+                <Actions handleRestart={this.handleRestart}/>
             </div>
         );
     }

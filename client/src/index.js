@@ -20,6 +20,22 @@ function calculateWinner(squares) {
             return squares[a];
         }
     }
+
+    // Circle can't win Cross, then the Cross wins
+    let countCircle, countCross = 0;
+
+    for (let i = 0; i < squares.length; i++) {
+        if (squares[i] === 'O') {
+            countCircle ++;
+        } else if (squares[i] === 'X') {
+            countCross ++;
+        }
+    }
+
+    if (countCircle === 5 && countCross === 4) {
+        return 'X';
+    }
+
     return null;
 }
 
@@ -38,9 +54,14 @@ class Status extends React.Component {
         const winner = calculateWinner(this.props.squares);
         let status;
         if (winner) {
-            status = 'Winner: ' + winner;
+            if (this.props.humanFirst && winner==='O') {
+                status = 'You wins!'
+            } else {
+                status = 'Hulihutu wins!'
+            }
         } else {
-            status = 'Next Player: ' + (this.props.xIsNext ? 'X' : 'O');
+            status = 'You are playing:'+ this.props.humanFirst?'O':'X' +'\n'
+                + 'Next Player: ' + (this.props.xIsNext ? 'X' : 'O');
         }
         return (
             <div className="status">{status}</div>
@@ -72,6 +93,7 @@ class Board extends React.Component {
             console.log(this.state)
             this.hulihutuPlay();
         }
+        this.getStatistics();
     }
 
     handleClick(i) {
@@ -81,7 +103,11 @@ class Board extends React.Component {
         }
         squares[i] = this.state.xIsNext ? 'X' : 'O';
         this.setState({squares: squares, xIsNext: !this.state.xIsNext}, ()=> {
-            this.hulihutuPlay();
+            if (calculateWinner(squares)) {
+                return;
+            } else {
+                this.hulihutuPlay();
+            }
         });
     }
 
@@ -93,18 +119,37 @@ class Board extends React.Component {
         });
     }
 
+    getStatistics() {
+        fetch('http://localhost:3000/statistics')
+            .then(response => response.json())
+            .then(json => {
+                var hulihutuWinCount, humanWinCount;
+                if (json[0].winner === 'hulihutu') {
+                    hulihutuWinCount = json[0].count;
+                    humanWinCount = json[1].count;
+                } else {
+                    hulihutuWinCount = json[1].count;
+                    humanWinCount = json[0].count;
+                }
+
+                this.setState({
+                    hulihutuWinCount: hulihutuWinCount,
+                    humanWinCount: humanWinCount
+                });
+            });
+    }
+
     hulihutuPlay() {
-        var that = this;
         function mapSymbolToCode(symbol){
-            if (symbol == 'O') {
+            if (symbol === 'O') {
                 return 1;
-            } else if (symbol == 'X') {
+            } else if (symbol === 'X') {
                 return 2;
             } else {
                 return 0
             }
         }
-        fetch('http://localhost:3000',{
+        fetch('http://localhost:3000/ai',{
             method: 'POST',
             headers: {
                 'Accept': 'application/json, text/plain, */*',
@@ -149,7 +194,8 @@ class Board extends React.Component {
     render() {
         return (
             <div>
-                <Status squares={this.state.squares} xIsNext={this.state.xIsNext}/>
+                <Status humanFirst={this.state.humanFirst}
+                    squares={this.state.squares} xIsNext={this.state.xIsNext}/>
                 <div className="board-row">
                     {this.renderSquare(0)}
                     {this.renderSquare(1)}

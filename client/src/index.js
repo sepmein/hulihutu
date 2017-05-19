@@ -22,7 +22,8 @@ function calculateWinner(squares) {
     }
 
     // Circle can't win Cross, then the Cross wins
-    let countCircle, countCross = 0;
+    let countCircle = 0;
+    let countCross = 0;
 
     for (let i = 0; i < squares.length; i++) {
         if (squares[i] === 'O') {
@@ -31,7 +32,8 @@ function calculateWinner(squares) {
             countCross ++;
         }
     }
-
+    console.log(countCircle);
+    console.log(countCross);
     if (countCircle === 5 && countCross === 4) {
         return 'X';
     }
@@ -54,17 +56,30 @@ class Status extends React.Component {
         const winner = calculateWinner(this.props.squares);
         let status;
         if (winner) {
-            if (this.props.humanFirst && winner==='O') {
-                status = 'You wins!'
+            if (this.props.humanFirst)  {
+                if(winner === 'O') {
+                    status = 'You wins!'
+                } else {
+                    status = 'Hulihutu wins!';
+                }
             } else {
-                status = 'Hulihutu wins!'
+                if(winner === 'O') {
+                    status = 'Hulihutu wins!'
+                } else {
+                    status = 'You wins!';
+                }
+
             }
         } else {
-            status = 'You are playing:'+ this.props.humanFirst?'O':'X' +'\n'
-                + 'Next Player: ' + (this.props.xIsNext ? 'X' : 'O');
+            //            status = 'You are playing:'+ (this.props.humanFirst?'O':'X');
+            //+'\n'+ 'Next Player: ' + (this.props.xIsNext ? 'X' : 'O');
+            status = 'You are playing: ' + (this.props.humanFirst ? 'O' : 'X');
         }
         return (
-            <div className="status">{status}</div>
+            <div className="status">
+                <p>Human wins: {this.props.humanWinCount} / Hulihutu wins: {this.props.hulihutuWinCount}</p>
+                <p>{status}</p>
+            </div>
         )
     }
 }
@@ -97,14 +112,15 @@ class Board extends React.Component {
     }
 
     handleClick(i) {
-        const squares = this.state.squares.slice();
+        let squares = this.state.squares.slice();
         if (calculateWinner(squares) || squares[i]) {
             return;
         }
         squares[i] = this.state.xIsNext ? 'X' : 'O';
         this.setState({squares: squares, xIsNext: !this.state.xIsNext}, ()=> {
+            squares = this.state.squares.slice();
             if (calculateWinner(squares)) {
-                return;
+                this.postStatistics();
             } else {
                 this.hulihutuPlay();
             }
@@ -139,6 +155,41 @@ class Board extends React.Component {
             });
     }
 
+    postStatistics() {
+        let mark = calculateWinner(this.state.squares);
+        let winner;
+        if(mark) {
+            if (this.state.humanFirst) {
+                if(mark === 'O') {
+                    winner = 'human';
+                } else {
+                    winner = 'hulihutu';
+                }
+            } else {
+                if (mark === 'O') {
+                    winner = 'hulihutu';
+                } else {
+                    winner = 'human';
+                }
+            }
+        }
+
+        if(winner) {
+            fetch('http://localhost:3000/statistics',{
+                method:'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json, text/plain'
+                },
+                body: JSON.stringify({
+                    winner: winner
+                })
+            });
+        }
+
+    }
+
+
     hulihutuPlay() {
         function mapSymbolToCode(symbol){
             if (symbol === 'O') {
@@ -168,15 +219,21 @@ class Board extends React.Component {
             })})
             .then(response=> response.json())
             .then(response => {
-                console.log(response);
                 var i = response.row *3 + response.column ;
-                console.log(i)
-                const squares = this.state.squares.slice();
+                let squares = this.state.squares.slice();
                 if (calculateWinner(squares) || squares[i]) {
                     return;
                 }
                 squares[i] = this.state.xIsNext ? 'X' : 'O';
-                this.setState({squares: squares, xIsNext: !this.state.xIsNext});
+                this.setState({squares: squares, xIsNext: !this.state.xIsNext}, () => {
+                    //after play
+                    //send to server
+                    //check winner
+                    squares = this.state.squares.slice();
+                    if (calculateWinner(squares)) {
+                        this.postStatistics();
+                    }
+                });
             }, function(error){
                 console.log(error);
             });
@@ -195,7 +252,10 @@ class Board extends React.Component {
         return (
             <div>
                 <Status humanFirst={this.state.humanFirst}
-                    squares={this.state.squares} xIsNext={this.state.xIsNext}/>
+                    squares={this.state.squares} xIsNext={this.state.xIsNext}
+                    humanWinCount={this.state.humanWinCount}
+                    hulihutuWinCount={this.state.hulihutuWinCount}
+                />
                 <div className="board-row">
                     {this.renderSquare(0)}
                     {this.renderSquare(1)}

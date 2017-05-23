@@ -32,8 +32,6 @@ function calculateWinner(squares) {
             countCross ++;
         }
     }
-    console.log(countCircle);
-    console.log(countCross);
     if (countCircle === 5 && countCross === 4) {
         return 'X';
     }
@@ -89,7 +87,7 @@ class Actions extends React.Component {
         return (
             <div>
                 <p>actions</p>
-                <button onClick={()=> this.props.handleRestart()}>
+                <button onClick={this.props.handleRestart}>
                     Restart
                 </button>
             </div>
@@ -105,7 +103,6 @@ class Board extends React.Component {
             humanFirst: Math.random() >= 0.5
         }
         if (!this.state.humanFirst) {
-            console.log(this.state)
             this.hulihutuPlay();
         }
         this.getStatistics();
@@ -131,7 +128,12 @@ class Board extends React.Component {
         this.setState({
             squares: Array(9).fill(null),
             xIsNext: false,
-            humanFirst: Math.random >= 0.5
+            humanFirst: Math.random() >= 0.5
+        },function(){
+            if (!this.state.humanFirst) {
+                this.hulihutuPlay();
+            }
+            this.getStatistics();
         });
     }
 
@@ -271,7 +273,7 @@ class Board extends React.Component {
                     {this.renderSquare(7)}
                     {this.renderSquare(8)}
                 </div>
-                <Actions handleRestart={this.handleRestart}/>
+                <Actions handleRestart={() => this.handleRestart()}/>
             </div>
         );
     }
